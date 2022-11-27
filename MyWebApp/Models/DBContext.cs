@@ -18,9 +18,14 @@ namespace MyWebApp.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("appsettings.json")
+            .Build();
+
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-ARDK013;Initial Catalog=ManageUserApp;Integrated Security=True;Encrypt=False");
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DatabaseConnectString"));
             }
         }
 

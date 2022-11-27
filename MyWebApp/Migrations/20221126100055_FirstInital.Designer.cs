@@ -11,8 +11,8 @@ using MyWebApp.Models;
 namespace MyWebApp.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20221125025856_AddStateModel")]
-    partial class AddStateModel
+    [Migration("20221126100055_FirstInital")]
+    partial class FirstInital
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,25 +32,39 @@ namespace MyWebApp.Migrations
                         .HasColumnType("int")
                         .HasColumnName("state_id");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StateId"));
+
                     b.Property<string>("FilterParam")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)")
-                        .HasDefaultValue("*")
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("state_filter");
+
+                    b.Property<bool>("IsDesc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("state_isdesc");
 
                     b.Property<int>("Page")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasDefaultValue(1)
+                        .HasDefaultValue(0)
                         .HasColumnName("state_page");
 
+                    b.Property<string>("SortBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("state_sortby");
+
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_state_id");
 
                     b.HasKey("StateId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("states", (string)null);
                 });
@@ -102,7 +116,7 @@ namespace MyWebApp.Migrations
                 {
                     b.HasOne("MyWebApp.Models.UserModel", "User")
                         .WithOne("State")
-                        .HasForeignKey("MyWebApp.Models.StateModel", "StateId")
+                        .HasForeignKey("MyWebApp.Models.StateModel", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

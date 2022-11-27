@@ -36,7 +36,6 @@ namespace MyWebApp
 
             services.AddSingleton<IUserService, UserRepository>();
             services.AddSingleton<IStateService, StateRepository>();
-
             services.AddSingleton<IAuthorizeJwt, JwtService>();
 
             services.AddSwaggerGen(c =>
@@ -85,6 +84,10 @@ namespace MyWebApp
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_Web_Core v1"));
             }
+
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_Web_Core v1"));
 
             app.UseMiddleware<JwtAuthorize>();
 
