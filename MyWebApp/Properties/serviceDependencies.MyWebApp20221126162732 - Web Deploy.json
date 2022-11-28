@@ -1,11 +1,19 @@
 {
   "dependencies": {
+    "secrets1": {
+      "ignored": "true",
+      "type": "secrets"
+    },
+    "mssql2": {
+      "ignored": "true",
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:ServerDatabaseConnectString"
+    },
     "mssql1": {
       "secretStore": "AzureAppSettings",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/aspcore/databases/MyWebApp_db",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/aspcore/databases/MyWebApp_db",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DatabaseConnectString",
-      "dynamicId": null
+      "connectionId": "ConnectionStrings:DatabaseConnectString"
     }
   }
 }

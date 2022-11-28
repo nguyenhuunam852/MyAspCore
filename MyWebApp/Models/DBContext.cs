@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+#nullable disable
 namespace MyWebApp.Models
 {
     public partial class DBContext : DbContext
     {
+        private readonly string _connectionString;
+
         public DBContext()
         {
         }
@@ -13,20 +16,17 @@ namespace MyWebApp.Models
         {
         }
 
+        public DBContext(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
         public virtual DbSet<UserModel> Users { get; set; }
         public virtual DbSet<StateModel> States { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json")
-            .Build();
-
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DatabaseConnectString"));
-            }
+            optionsBuilder.UseSqlServer(_connectionString);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MyWebApp.Interface;
 using MyWebApp.Middlewares;
+using MyWebApp.Models;
 using MyWebApp.Repositories;
 using MyWebApp.Services;
 using MyWebApp.Shared;
@@ -12,8 +14,11 @@ namespace MyWebApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
+            _env = environment;
             Configuration = configuration;
         }
 
@@ -21,9 +26,29 @@ namespace MyWebApp
 
         public void ConfigureServices(IServiceCollection services)
         {
+            if (_env.IsDevelopment())
+            {
+                services.AddDbContext<DBContext>(options =>
+                  options.UseSqlServer(Configuration.GetConnectionString("DatabaseConnectString")));
+            }
+            else
+            {
+                services.AddDbContext<DBContext>(options =>
+                  options.UseSqlServer(Configuration.GetConnectionString("ServerDatabaseConnectString")));
+            }
+
             services.AddCors();
 
             services.AddControllers();
+
+            if (_env.IsDevelopment())
+            {
+                services.AddSingleton<DBContext>(s => new DBContext(Configuration.GetConnectionString("LocalDatabaseConnectString")));
+            }
+            else
+            {
+                services.AddSingleton<DBContext>(s => new DBContext(Configuration.GetConnectionString("DatabaseConnectString")));
+            }
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -78,17 +103,13 @@ namespace MyWebApp
                    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
             );
 
-            if (env.IsDevelopment())
+            if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_Web_Core v1"));
             }
-
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_Web_Core v1"));
-
+           
             app.UseMiddleware<JwtAuthorize>();
 
             app.ConfigureExceptionHandler();

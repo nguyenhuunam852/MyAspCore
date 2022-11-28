@@ -16,11 +16,13 @@ namespace MyWebApp.Controllers
     {
         private readonly IUserService _userInterface;
         private readonly IStateService _stateInterface;
+        private readonly ILogger<userController> _logger;
 
-        public userController(IUserService userInterface, IStateService stateInterface)
+        public userController(IUserService userInterface, IStateService stateInterface, ILogger<userController> logger)
         {
             _userInterface = userInterface;
             _stateInterface = stateInterface;
+            _logger = logger;
         }
 
         [Route("getlist")]
@@ -56,6 +58,7 @@ namespace MyWebApp.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogInformation("Error {0}", e.Message);
                 return new CustomResponse(500, new List<string>() { "Server Errors!" });
             }
         }

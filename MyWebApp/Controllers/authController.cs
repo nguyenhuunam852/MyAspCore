@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using MyWebApp.DTO;
 using MyWebApp.DTO.User.Request;
 using MyWebApp.DTO.User.Response;
 using MyWebApp.Interface;
 using MyWebApp.Models;
-using MyWebApp.Shared;
-using System.Net;
 
 namespace MyWebApp.Controllers
 {
@@ -17,6 +14,8 @@ namespace MyWebApp.Controllers
     {
         private readonly IUserService _userInterface;
         private readonly IAuthorizeJwt _authorizeJwt;
+        private readonly ILogger<authController> _logger;
+
         private readonly Dictionary<int, Tuple<int, List<string>>> _listErrors = new Dictionary<int, Tuple<int, List<string>>>()
         {
             { 1, new Tuple<int, List<string>>(StatusCodes.Status422UnprocessableEntity, new List<string>() { "Confirm Password Fail" }) },
@@ -25,8 +24,9 @@ namespace MyWebApp.Controllers
             { 4, new Tuple<int, List<string>>(StatusCodes.Status404NotFound, new List<string>() { "User Login Fail!" }) },
         };
 
-        public authController(IAuthorizeJwt authorizeJwt,IUserService userInterface, IOptions<AppSettings> appSettings)
+        public authController(IAuthorizeJwt authorizeJwt,IUserService userInterface, ILogger<authController> logger)
         {
+            _logger = logger;
             _userInterface = userInterface;
             _authorizeJwt = authorizeJwt;
         }
@@ -49,7 +49,9 @@ namespace MyWebApp.Controllers
                 if (newUser == null) 
                     return new CustomResponse(_listErrors[3]);
 
-                else return new CustomResponse(content: new ResponseRegisterDTO()
+                _logger.LogInformation("New User Created {DT}", newUser.UserName);
+
+                return new CustomResponse(content: new ResponseRegisterDTO()
                    {
                        UserId = newUser.UserId,
                        UserName = newUser.UserName,
@@ -58,8 +60,9 @@ namespace MyWebApp.Controllers
                    }
                 );
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogInformation("Error {0}", e.Message);
                 return new CustomResponse(_listErrors[3]);
             }
         }
@@ -83,8 +86,9 @@ namespace MyWebApp.Controllers
                     });
                 }
             }
-            catch
+            catch(Exception e)
             {
+                _logger.LogInformation("Error {0}", e.Message);
                 return new CustomResponse(_listErrors[3]);
             }
         }

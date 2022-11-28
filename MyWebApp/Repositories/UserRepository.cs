@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyWebApp.Controllers;
 using MyWebApp.DTO.User.Request;
 using MyWebApp.Interface;
 using MyWebApp.Models;
@@ -8,8 +9,15 @@ namespace MyWebApp.Repositories
     public class UserRepository : IUserService
     {
         private readonly int _perPage = 5;
+        private readonly ILogger<UserRepository> _logger;
+        private readonly DBContext _dbContext;
 
-        private readonly List<string> _listSortOrder = new List<string>(){ "username","fullname","email" };
+        private readonly List<string> _listSortOrder = new List<string>() { "username", "fullname", "email" };
+
+        public UserRepository(DBContext dbContext,ILogger<UserRepository> logger){
+            _logger = logger;
+            _dbContext = dbContext;
+        }
 
         //private method
         private IQueryable<UserModel> orderList(IQueryable<UserModel> userList, bool isDesc, string sortBy)
@@ -75,18 +83,17 @@ namespace MyWebApp.Repositories
         {
             try
             {
-                using (var context = new DBContext())
-                {
-                    var getUser = from user in context.Users
-                               where user.UserName == userName
-                                  select user;
-                    if (!getUser.Any()) return null;
-                    return getUser.First();
-                }
+               
+               var getUser = from user in _dbContext.Users
+                          where user.UserName == userName
+                             select user;
+               if (!getUser.Any()) return null;
+               return getUser.First();
             }
-            catch
+            catch (Exception e)
             {
-                throw new System.Exception("getUserByUserName");
+                _logger.LogError(e.Message);
+                throw new Exception("getUserByUserName");
             }
         }
 
@@ -94,19 +101,17 @@ namespace MyWebApp.Repositories
         {
             try
             {
-                using (var context = new DBContext())
-                {
-                    var getUser = from user in context.Users
-                                  where user.UserName == requestUserDTO.UserName &&
-                                        user.Password == requestUserDTO.UserPassword
-                                  select user;
-                    if (!getUser.Any()) return null;
-                    return getUser.First();
-                }
+               var getUser = from user in _dbContext.Users
+                             where user.UserName == requestUserDTO.UserName &&
+                                   user.Password == requestUserDTO.UserPassword
+                             select user;
+               if (!getUser.Any()) return null;
+               return getUser.First();
             }
-            catch
+            catch (Exception e)
             {
-                throw new System.Exception("getUserByLogin");
+                _logger.LogError(e.Message);
+                throw new Exception("getUserByLogin");
             }
         }
 
@@ -122,18 +127,16 @@ namespace MyWebApp.Repositories
                     Password = requestUserDTO.UserPassword,
                 };
 
-                using (var context = new DBContext())
-                {
-                    context.Users.Add(userModel);
+                _dbContext.Users.Add(userModel);
 
-                    context.SaveChanges();
-                }
+                _dbContext.SaveChanges();
 
                 return userModel;
             }
-            catch
+            catch (Exception e)
             {
-                throw new System.Exception("RegisterNewUser");
+                _logger.LogError(e.Message);
+                throw new Exception("RegisterNewUser");
             }
         }
 
@@ -141,15 +144,13 @@ namespace MyWebApp.Repositories
         {
             try
             {
-                using (var context = new DBContext())
-                {
-                    var getUser = await context.Users.FindAsync(userId);
-                    return getUser;
-                }
+               var getUser = await _dbContext.Users.FindAsync(userId);
+               return getUser;
             }
-            catch
+            catch (Exception e)
             {
-                throw new System.Exception("getUserByUserId");
+                _logger.LogError(e.Message);
+                throw new Exception("getUserByUserId");
             }
         }
     }
