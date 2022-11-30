@@ -41,7 +41,7 @@ namespace MyWebApp.Controllers
                 if (requestUserDTO.UserPassword != requestUserDTO.ConfirmPassword)
                     return new CustomResponse(_listErrors[1]);
 
-                if (this._userInterface.getUserByUserName(requestUserDTO.UserName) != null)
+                if (this._userInterface.GetUserByUserName(requestUserDTO.UserName) != null)
                     return new CustomResponse(_listErrors[2]);
 
                 UserModel? newUser = this._userInterface.RegisterNewUser(requestUserDTO);
@@ -74,7 +74,7 @@ namespace MyWebApp.Controllers
         {
             try
             {
-                UserModel? newUser = this._userInterface.getUserByLogin(requestUserDTO);
+                UserModel? newUser = this._userInterface.GetUserByLogin(requestUserDTO);
 
                 if (newUser == null) return new CustomResponse(_listErrors[4]);
                 else

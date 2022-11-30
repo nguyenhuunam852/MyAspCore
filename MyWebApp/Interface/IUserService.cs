@@ -9,13 +9,14 @@ namespace MyWebApp.Interface
         
         //Users Method
         UserModel? RegisterNewUser(RequestRegisterUserDTO requestUserDTO);
-        UserModel? getUserByUserName(string userId);
-        UserModel? getUserByLogin(RequestUserLoginDTO requestUserDTO);
+        UserModel? GetUserByUserName(string userId);
+        UserModel? GetUserByLogin(RequestUserLoginDTO requestUserDTO);
 
         //List Users
-        Tuple<int, List<UserModel>> getAllUsersWithFilters(StateModel stateModel);
+        Tuple<int, List<UserModel>> GetAllUsersWithFilters(StateModel stateModel);
 
         //Aync Method
-        Task<UserModel?> getUserByUserIdAsync(int userID);
+        Task<UserModel?> GetUserByUserIdAsync(int userID);
+        Task<UserModel?> GetDefaultUser();
     }
 }

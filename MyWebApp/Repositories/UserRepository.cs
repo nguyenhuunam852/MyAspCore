@@ -14,7 +14,7 @@ namespace MyWebApp.Repositories
 
         private readonly List<string> _listSortOrder = new List<string>() { "username", "fullname", "email" };
 
-        public UserRepository(DBContext dbContext,ILogger<UserRepository> logger){
+        public UserRepository(DBContext dbContext, ILogger<UserRepository> logger){
             _logger = logger;
             _dbContext = dbContext;
         }
@@ -46,32 +46,28 @@ namespace MyWebApp.Repositories
             return _listSortOrder;
         }
 
-        public Tuple<int,List<UserModel>> getAllUsersWithFilters(StateModel stateModel)
+        public Tuple<int,List<UserModel>> GetAllUsersWithFilters(StateModel stateModel)
         {
             try
             {
                 int pages = 0;
+                var pagiList = _dbContext.Users;
 
-                using (var context = new DBContext())
+                if (!string.IsNullOrEmpty(stateModel.FilterParam))
                 {
-                    var pagiList = context.Users;
+                    var filterList = from users in pagiList where  
+                                     EF.Functions.Like(users.UserName, String.Format("%{0}%", stateModel.FilterParam)) ||
+                                     EF.Functions.Like(users.FullName, String.Format("%{0}%", stateModel.FilterParam))
+                                     select users;
 
-                    if (!string.IsNullOrEmpty(stateModel.FilterParam))
-                    {
-                        var filterList = from users in pagiList where  
-                                         EF.Functions.Like(users.UserName, String.Format("%{0}%", stateModel.FilterParam)) ||
-                                         EF.Functions.Like(users.FullName, String.Format("%{0}%", stateModel.FilterParam))
-                                         select users;
+                    pages = ((filterList.Count()) % _perPage == 0) ? filterList.Count() / _perPage : filterList.Count() / _perPage + 1;
 
-                        pages = ((filterList.Count()) % _perPage == 0) ? filterList.Count() / _perPage : filterList.Count() / _perPage + 1;
-
-                        return new Tuple<int, List<UserModel>>(pages, getOrderPagiList(filterList, stateModel.Page, stateModel.IsDesc, stateModel.SortBy));
-                    }
-
-                    pages = ((pagiList.Count()) % _perPage == 0) ? pagiList.Count() / _perPage : pagiList.Count() / _perPage + 1;
-
-                    return new Tuple<int, List<UserModel>>(pages, getOrderPagiList(pagiList, stateModel.Page, stateModel.IsDesc, stateModel.SortBy));
+                    return new Tuple<int, List<UserModel>>(pages, getOrderPagiList(filterList, stateModel.Page, stateModel.IsDesc, stateModel.SortBy));
                 }
+
+                pages = ((pagiList.Count()) % _perPage == 0) ? pagiList.Count() / _perPage : pagiList.Count() / _perPage + 1;
+
+                return new Tuple<int, List<UserModel>>(pages, getOrderPagiList(pagiList, stateModel.Page, stateModel.IsDesc, stateModel.SortBy));
             }
             catch
             {
@@ -79,7 +75,7 @@ namespace MyWebApp.Repositories
             }
         }
 
-        public UserModel? getUserByUserName(string userName)
+        public UserModel? GetUserByUserName(string userName)
         {
             try
             {
@@ -97,7 +93,7 @@ namespace MyWebApp.Repositories
             }
         }
 
-        public UserModel? getUserByLogin(RequestUserLoginDTO requestUserDTO)
+        public UserModel? GetUserByLogin(RequestUserLoginDTO requestUserDTO)
         {
             try
             {
@@ -140,12 +136,26 @@ namespace MyWebApp.Repositories
             }
         }
 
-        public async Task<UserModel?> getUserByUserIdAsync(int userId)
+        public async Task<UserModel?> GetUserByUserIdAsync(int userId)
         {
             try
             {
                var getUser = await _dbContext.Users.FindAsync(userId);
                return getUser;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                throw new Exception("getUserByUserId");
+            }
+        }
+
+        public async Task<UserModel?> GetDefaultUser()
+        {
+            try
+            {
+                var getUser = await _dbContext.Users.FirstOrDefaultAsync();
+                return getUser;
             }
             catch (Exception e)
             {

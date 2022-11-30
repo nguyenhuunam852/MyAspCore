@@ -6,7 +6,7 @@
         {
             { StatusCodes.Status400BadRequest , "BadRequest Errors" },
             { StatusCodes.Status409Conflict , "Conflict Errors" },
-            { StatusCodes.Status403Forbidden , "" },
+            { StatusCodes.Status403Forbidden , "Forbidden Errors" },
             { StatusCodes.Status404NotFound , "NotFound Errors" },
             { StatusCodes.Status500InternalServerError , "Server Errors" },
             { StatusCodes.Status422UnprocessableEntity , "Validation Errors" },

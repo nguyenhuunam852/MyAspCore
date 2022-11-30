@@ -9,78 +9,62 @@ namespace MyWebApp.Repositories
     public class StateRepository : IStateService
     {
         private readonly IUserService _userInterface;
+        private readonly DBContext _dbContext;
+        private readonly ILogger<UserRepository> _logger;
 
-        public StateRepository(IUserService userService)
+        public StateRepository(DBContext dbContext, IUserService userService, ILogger<UserRepository> logger)
         {
             _userInterface = userService;
+            _dbContext = dbContext;
         }
 
         public StateModel GetState(StateRequestDto stateRequestDto, int userId)
         {
             try
             {
-                bool firstLogin = stateRequestDto.FirstLogin ?? false;
-                bool sortOrder = stateRequestDto.DESC ?? false;
+                StateModel returnState;
+  
+                var getState = from states in _dbContext.States
+                             where states.UserId == userId
+                             select states;
 
-                string sortBy = "";
-                if (string.IsNullOrEmpty(stateRequestDto.SortBy))
+                if (getState.Any())
                 {
-                    sortBy = _userInterface.GetListSortOrder()[0];
+                    var updateState = getState.First();
+                
+                    if((bool)stateRequestDto.FirstLogin) return updateState;
+
+                    updateState.FilterParam = stateRequestDto.Filter;
+                    updateState.Page = (int)((stateRequestDto.Page == null) ? 0 : stateRequestDto.Page - 1);
+                    updateState.IsDesc = (bool)stateRequestDto.DESC;
+                    updateState.SortBy = stateRequestDto.SortBy;
+
+                    _dbContext.States.Update(updateState);
+                    returnState = updateState;
                 }
                 else
                 {
-                    if (!_userInterface.GetListSortOrder().Contains(sortBy)) return null;
+                    var newState = new StateModel()
+                    {
+                        UserId = userId,
+                        Page = (int)((stateRequestDto.Page == null) ? 0 : stateRequestDto.Page-1),
+                        FilterParam = stateRequestDto.Filter,
+                        IsDesc = (bool)stateRequestDto.DESC,
+                        SortBy = stateRequestDto.SortBy
+                    };
+
+                    _dbContext.States.Add(newState);
+                
+                    returnState = newState;
                 }
 
-                StateModel returnState;
+                _dbContext.SaveChanges();
 
-                using (var context = new DBContext())
-                {
-                    var getState = from states in context.States
-                                   where states.UserId == userId
-                                   select states;
-
-                    if (getState.Any())
-                    {
-                        var updateState = getState.First();
-
-                        if(firstLogin) return updateState;
-
-                        if (stateRequestDto.Page - 1 != updateState.Page || stateRequestDto.Filter != updateState.FilterParam)
-                        {
-                            updateState.FilterParam = stateRequestDto.Filter;
-                            updateState.Page = (int)((stateRequestDto.Page == null) ? 0 : stateRequestDto.Page-1);
-                            updateState.IsDesc = sortOrder;
-                            updateState.SortBy = sortBy;
-
-                            context.States.Update(updateState);
-                        }
-
-                        returnState = updateState;
-                    }
-                    else
-                    {
-                        var newState = new StateModel()
-                        {
-                            UserId = userId,
-                            Page = (int)((stateRequestDto.Page == null) ? 0 : stateRequestDto.Page-1),
-                            FilterParam = stateRequestDto.Filter,
-                            IsDesc = sortOrder,
-                            SortBy = sortBy
-                        };
-
-                        context.States.Add(newState);
-
-                        returnState = newState;
-                    }
-
-                    context.SaveChanges();
-
-                    return returnState;
-                }
+                return returnState;
             }
             catch(Exception e)
             {
+                _logger.LogError(e.Message);
                 throw new Exception("CreateNewState");
             }
         }

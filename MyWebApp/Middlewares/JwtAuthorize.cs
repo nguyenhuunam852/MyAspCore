@@ -37,7 +37,7 @@ namespace MyWebApp.Middlewares
             {
                 if (token.Equals(_adminToken, StringComparison.OrdinalIgnoreCase))
                 {
-                    context.Items["Account"] = await this._userInterface.getUserByUserIdAsync(1);
+                    context.Items["Account"] = await this._userInterface.GetDefaultUser();
                 }
                 else
                 {
@@ -55,7 +55,7 @@ namespace MyWebApp.Middlewares
                     var jwtToken = (JwtSecurityToken)validatedToken;
                     var accountId = int.Parse(jwtToken.Claims.First(x => x.Type == "user_id").Value);
 
-                    context.Items["Account"] = await this._userInterface.getUserByUserIdAsync(accountId);
+                    context.Items["Account"] = await this._userInterface.GetUserByUserIdAsync(accountId);
                 }
             }
             catch

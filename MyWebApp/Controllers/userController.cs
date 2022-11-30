@@ -18,6 +18,12 @@ namespace MyWebApp.Controllers
         private readonly IStateService _stateInterface;
         private readonly ILogger<userController> _logger;
 
+        private readonly Dictionary<int, Tuple<int, List<string>>> _listErrors = new Dictionary<int, Tuple<int, List<string>>>()
+        {
+            { 1, new Tuple<int, List<string>>(StatusCodes.Status404NotFound, new List<string>() { "Sort Order Not Exist!" }) },
+            { 2, new Tuple<int, List<string>>(StatusCodes.Status500InternalServerError, new List<string>() { "Server Errors!" }) },
+        };
+
         public userController(IUserService userInterface, IStateService stateInterface, ILogger<userController> logger)
         {
             _userInterface = userInterface;
@@ -25,7 +31,19 @@ namespace MyWebApp.Controllers
             _logger = logger;
         }
 
-        [Route("getlist")]
+        private StateRequestDto copyRequest(StateRequestDto requestDto, bool firstLogin, bool sortOrder, string sortBy)
+        {
+            return new StateRequestDto()
+            {
+                FirstLogin = firstLogin,
+                DESC = sortOrder,
+                SortBy = (string.IsNullOrEmpty(sortBy))? requestDto.SortBy: sortBy,
+                Page = requestDto.Page,
+                Filter = requestDto.Filter
+            };
+        }
+
+        [Route("")]
         [AttributeJwt]
         [HttpGet]
         public CustomResponse GetList([FromQuery] StateRequestDto requestDto)
@@ -34,11 +52,24 @@ namespace MyWebApp.Controllers
             {
                 var account = (UserModel)HttpContext.Items["Account"];
 
-                var getCurrentState = this._stateInterface.GetState(requestDto, account.UserId);
+                string sortBy = "";
+                if (string.IsNullOrEmpty(requestDto.SortBy))
+                {
+                    sortBy = _userInterface.GetListSortOrder()[0];
+                }
+                else
+                {
+                    if (!_userInterface.GetListSortOrder().Contains(requestDto.SortBy)) return new CustomResponse(_listErrors[1]);
+                }
 
-                if(getCurrentState == null) return new CustomResponse(404, new List<string>() { "Sort Order Not Exist!" });
+                bool firstLogin = requestDto.FirstLogin ?? false;
+                bool sortOrder = requestDto.DESC ?? false;
 
-                var tupleInfo = this._userInterface.getAllUsersWithFilters(getCurrentState);
+                var processingRequestDto = copyRequest(requestDto, firstLogin, sortOrder, sortBy);
+ 
+                var getCurrentState = this._stateInterface.GetState(processingRequestDto, account.UserId);
+
+                var tupleInfo = this._userInterface.GetAllUsersWithFilters(getCurrentState);
 
                 var responseListUser = new UserPagiListResponseDTO()
                 {
@@ -59,7 +90,7 @@ namespace MyWebApp.Controllers
             catch (Exception e)
             {
                 _logger.LogInformation("Error {0}", e.Message);
-                return new CustomResponse(500, new List<string>() { "Server Errors!" });
+                return new CustomResponse(_listErrors[2]);
             }
         }
     }
