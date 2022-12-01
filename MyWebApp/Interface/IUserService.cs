@@ -14,6 +14,7 @@ namespace MyWebApp.Interface
 
         //List Users
         Tuple<int, List<UserModel>> GetAllUsersWithFilters(StateModel stateModel);
+        Tuple<int, List<UserModel>> GetAllUsersWithRawFilters(StateModel stateModel);
 
         //Aync Method
         Task<UserModel?> GetUserByUserIdAsync(int userID);

@@ -1,8 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Data.Entity.Infrastructure;
 
 #nullable disable
 namespace MyWebApp.Models
 {
+
+    public static class ContextExtensions
+    {
+        public static string GetTableName<T>(this DbContext context) where T : class
+        {
+            var entityType = context.Model.FindEntityType(typeof(T));
+            var name = entityType!.GetTableName();
+
+            return name;
+        }
+    }
+
     public partial class DBContext : DbContext
     {
         private readonly string _connectionString;

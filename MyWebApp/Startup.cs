@@ -26,17 +26,6 @@ namespace MyWebApp
 
         public void ConfigureServices(IServiceCollection services)
         {
-            if (_env.IsDevelopment())
-            {
-                services.AddDbContext<DBContext>(options =>
-                  options.UseSqlServer(Configuration.GetConnectionString("DatabaseConnectString")));
-            }
-            else
-            {
-                services.AddDbContext<DBContext>(options =>
-                  options.UseSqlServer(Configuration.GetConnectionString("ServerDatabaseConnectString")));
-            }
-
             services.AddCors();
 
             services.AddControllers();
@@ -61,7 +50,9 @@ namespace MyWebApp
 
             services.AddSingleton<IUserService, UserRepository>();
             services.AddSingleton<IStateService, StateRepository>();
+
             services.AddSingleton<IAuthorizeJwt, JwtService>();
+            services.AddSingleton<ICustomPagination, PaginationService>();
 
             services.AddSwaggerGen(c =>
             {
@@ -121,6 +112,11 @@ namespace MyWebApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapGet("/", context =>
+                {
+                    return Task.Run(() => context.Response.Redirect("/api/user/"));
+                });
             });
         }
     }

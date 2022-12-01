@@ -10,13 +10,19 @@ namespace MyWebApp.Repositories
     {
         private readonly int _perPage = 5;
         private readonly ILogger<UserRepository> _logger;
+        private readonly ICustomPagination _pagination;
+
         private readonly DBContext _dbContext;
 
         private readonly List<string> _listSortOrder = new List<string>() { "username", "fullname", "email" };
+        private readonly List<string> _listQueries = new List<string>() { "user_name", "user_fullname" };
+        private readonly List<string> _listSortOrderDatabase = new List<string>() { "user_username", "user_fullname", "user_email" };
 
-        public UserRepository(DBContext dbContext, ILogger<UserRepository> logger){
+        public UserRepository(DBContext dbContext, ILogger<UserRepository> logger, ICustomPagination pagination)
+        {
             _logger = logger;
             _dbContext = dbContext;
+            _pagination = pagination;
         }
 
         //private method
@@ -56,8 +62,8 @@ namespace MyWebApp.Repositories
                 if (!string.IsNullOrEmpty(stateModel.FilterParam))
                 {
                     var filterList = from users in pagiList where  
-                                     EF.Functions.Like(users.UserName, String.Format("%{0}%", stateModel.FilterParam)) ||
-                                     EF.Functions.Like(users.FullName, String.Format("%{0}%", stateModel.FilterParam))
+                                     EF.Functions.Like(users.UserName, string.Format("%{0}%", stateModel.FilterParam)) ||
+                                     EF.Functions.Like(users.FullName, string.Format("%{0}%", stateModel.FilterParam))
                                      select users;
 
                     pages = ((filterList.Count()) % _perPage == 0) ? filterList.Count() / _perPage : filterList.Count() / _perPage + 1;
@@ -71,6 +77,26 @@ namespace MyWebApp.Repositories
             }
             catch
             {
+                throw new Exception("getAllUserWithFilters");
+            }
+        }
+
+        public Tuple<int, List<UserModel>> GetAllUsersWithRawFilters(StateModel stateModel)
+        {
+            try
+            {
+                int pages = 0;
+                var pagiList = _dbContext.Users;
+
+                stateModel.SortBy = _listSortOrderDatabase[_listSortOrder.IndexOf(stateModel.SortBy)];
+
+                List<UserModel> test = _pagination.GetByRawOrderPagiList<UserModel>(pagiList, stateModel, _perPage, _listQueries.ToArray());
+
+                return new Tuple<int, List<UserModel>>(pages, test);
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.Message);
                 throw new Exception("getAllUserWithFilters");
             }
         }

@@ -69,7 +69,8 @@ namespace MyWebApp.Controllers
  
                 var getCurrentState = this._stateInterface.GetState(processingRequestDto, account.UserId);
 
-                var tupleInfo = this._userInterface.GetAllUsersWithFilters(getCurrentState);
+                //var tupleInfo = this._userInterface.GetAllUsersWithFilters(getCurrentState);
+                var tupleInfo = this._userInterface.GetAllUsersWithRawFilters(getCurrentState);
 
                 var responseListUser = new UserPagiListResponseDTO()
                 {
