@@ -77,6 +77,8 @@ namespace MyWebApp.Controllers
                     Pages = tupleInfo.Item1,
                     CurrentPage = getCurrentState.Page + 1,
                     FilterParam = getCurrentState.FilterParam,
+                    UserName = account.UserName,
+
                     UserInfoDtos = tupleInfo.Item2.Select(item => new UserInfoDto()
                     {
                         UserId = item.UserId,

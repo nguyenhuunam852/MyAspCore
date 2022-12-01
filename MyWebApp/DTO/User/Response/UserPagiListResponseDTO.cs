@@ -9,6 +9,8 @@ namespace MyWebApp.DTO.User.Response
         public int Pages { get; set; }
         public int CurrentPage { get; set; }
         public string FilterParam { get; set; }
+        public string UserName { get; set; }
+
         public UserInfoDto[] UserInfoDtos { get; set; }
     }
 }
