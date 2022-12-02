@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MyWebApp.DTO;
 using MyWebApp.Interface;
 using MyWebApp.Middlewares;
 using MyWebApp.Models;
 using MyWebApp.Repositories;
 using MyWebApp.Services;
 using MyWebApp.Shared;
+using System.Net;
 
 #nullable disable
 
@@ -45,7 +47,6 @@ namespace MyWebApp
             });
 
             services.AddControllers(options => options.Filters.Add(new ValidationFilterAttribute()));
-
             services.Configure<AppSettings>(Configuration.GetSection("Jwt"));
 
             services.AddSingleton<IUserService, UserRepository>();
@@ -107,7 +108,17 @@ namespace MyWebApp
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.Use(async (context, next) =>
+            {
+                await next();
+                if (context.Response.StatusCode == 404)
+                { 
+                    var errorMessage = new CustomResponse(404, new List<string>() { "Path Not Found!"});
+
+                    context.Response.StatusCode = 200;
+                    await context.Response.WriteAsJsonAsync(errorMessage) ;
+                }
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -115,7 +126,7 @@ namespace MyWebApp
 
                 endpoints.MapGet("/", context =>
                 {
-                    return Task.Run(() => context.Response.Redirect("/api/user/"));
+                    return Task.Run(() => context.Response.Redirect("/home"));
                 });
             });
         }
