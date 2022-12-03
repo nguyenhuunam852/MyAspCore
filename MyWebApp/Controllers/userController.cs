@@ -125,7 +125,7 @@ namespace MyWebApp.Controllers
         [AttributeJwt]
         [Route("sleep")]
         [HttpGet]
-        public CustomResponse GetListSleep([FromBody] SleepEntryDeleteRequest requestUserDTO)
+        public CustomResponse GetListSleep()
         {
             try
             {
