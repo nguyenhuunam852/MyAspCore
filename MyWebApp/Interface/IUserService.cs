@@ -4,17 +4,18 @@ using MyWebApp.Models;
 namespace MyWebApp.Interface
 {
     public interface IUserService
-    {
-        List<string> GetListSortOrder();
-        
+    {        
         //Users Method
         UserModel? RegisterNewUser(RequestRegisterUserDTO requestUserDTO);
         UserModel? GetUserByUserName(string userId);
         UserModel? GetUserByLogin(RequestUserLoginDTO requestUserDTO);
+        UserModel? CheckUserByID(int userId);
+
+        bool DeleteUser(UserModel user);
+        bool UpdateUser(UserModel user, RequestUpdateDto requestUpdateDto);
 
         //List Users
-        Tuple<int, List<UserModel>> GetAllUsersWithFilters(StateModel stateModel);
-        Tuple<int, List<UserModel>> GetAllUsersWithRawFilters(StateModel stateModel);
+        List<UserModel> GetAllUsers();
 
         //Aync Method
         Task<UserModel?> GetUserByUserIdAsync(int userID);

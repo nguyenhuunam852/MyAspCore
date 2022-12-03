@@ -55,8 +55,7 @@ namespace MyWebApp.Controllers
                    {
                        UserId = newUser.UserId,
                        UserName = newUser.UserName,
-                       Email = newUser.Email,
-                       Jwt = string.Empty
+                       Email = newUser.Email
                    }
                 );
             }

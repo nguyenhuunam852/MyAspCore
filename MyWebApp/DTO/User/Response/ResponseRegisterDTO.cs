@@ -11,8 +11,5 @@ namespace MyWebApp.DTO.User.Response
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Email { get; set; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? Jwt { get; set; }
     }
 }

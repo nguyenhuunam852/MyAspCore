@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyWebApp.Models;
 
@@ -11,9 +12,11 @@ using MyWebApp.Models;
 namespace MyWebApp.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20221203100415_SecondMigration")]
+    partial class SecondMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,12 +39,6 @@ namespace MyWebApp.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("sleep_entry_date");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("user_isdeleted");
-
                     b.Property<int>("SleepDuration")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -52,12 +49,7 @@ namespace MyWebApp.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("sleep_entry_wakeuptime");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("SleepEntryId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("sleep_entries", (string)null);
                 });
@@ -86,7 +78,7 @@ namespace MyWebApp.Migrations
                     b.Property<bool>("IsAdmin")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false)
+                        .HasDefaultValue(true)
                         .HasColumnName("user_isadmin");
 
                     b.Property<bool>("IsDeleted")
@@ -115,22 +107,6 @@ namespace MyWebApp.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
-                });
-
-            modelBuilder.Entity("MyWebApp.Models.SleepEntryModel", b =>
-                {
-                    b.HasOne("MyWebApp.Models.UserModel", "User")
-                        .WithMany("SleepEntries")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MyWebApp.Models.UserModel", b =>
-                {
-                    b.Navigation("SleepEntries");
                 });
 #pragma warning restore 612, 618
         }

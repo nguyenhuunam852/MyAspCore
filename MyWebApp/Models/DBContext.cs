@@ -1,21 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Data.Entity.Infrastructure;
 
 #nullable disable
 namespace MyWebApp.Models
 {
-
-    public static class ContextExtensions
-    {
-        public static string GetTableName<T>(this DbContext context) where T : class
-        {
-            var entityType = context.Model.FindEntityType(typeof(T));
-            var name = entityType!.GetTableName();
-
-            return name;
-        }
-    }
-
     public partial class DBContext : DbContext
     {
         private readonly string _connectionString;
@@ -35,7 +22,7 @@ namespace MyWebApp.Models
         }
 
         public virtual DbSet<UserModel> Users { get; set; }
-        public virtual DbSet<StateModel> States { get; set; }
+        public virtual DbSet<SleepEntryModel> SleepEntries { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -78,45 +65,51 @@ namespace MyWebApp.Models
                     .IsUnicode(false)
                     .HasColumnName("user_email");
 
+                entity.Property(e => e.IsDeleted)
+                    .IsRequired()
+                    .HasDefaultValue(0)
+                    .HasColumnName("user_isdeleted");
+
+                entity.Property(e => e.IsAdmin)
+                    .IsRequired()
+                    .HasDefaultValue(0)
+                    .HasColumnName("user_isadmin");
+
                 entity.HasIndex(u => u.UserName).IsUnique();
             });
 
-            modelBuilder.Entity<StateModel>(entity =>
+            modelBuilder.Entity<SleepEntryModel>(entity =>
             {
-                entity.ToTable("states");
+                entity.ToTable("sleep_entries");
 
-                entity.HasKey(e => e.StateId);
+                entity.HasKey(e => e.SleepEntryId);
 
-                entity.Property(e => e.StateId).ValueGeneratedOnAdd().HasColumnName("state_id");
+                entity.Property(e => e.SleepEntryId).ValueGeneratedOnAdd().HasColumnName("sleep_entry_id");
 
-                entity.Property(e => e.Page)
+                entity.Property(e => e.SleepDuration)
                     .IsRequired()
                     .HasDefaultValue(0)
-                    .HasColumnName("state_page");
+                    .HasColumnName("sleep_entry_page");
 
-                entity.Property(e => e.IsDesc)
-                    .IsRequired()
-                    .HasDefaultValue(0)
-                    .HasColumnName("state_isdesc");
+                entity.Property(e => e.Date)
+                   .HasColumnName("sleep_entry_date");
 
-                entity.Property(e => e.SortBy)
-                    .IsRequired()
-                    .HasColumnName("state_sortby");
+                entity.Property(e => e.SleepTime)
+                   .HasColumnName("sleep_entry_sleeptime");
 
-                entity.Property(e => e.FilterParam)
-                    .HasMaxLength(100)
-                    .IsUnicode(true)
-                    .HasColumnName("state_filter");
+                entity.Property(e => e.SleepTime)
+                   .HasColumnName("sleep_entry_wakeuptime");
 
-                entity.Property(e => e.UserId)
-                    .HasColumnName("user_state_id")
-                   .IsRequired();
+                entity.Property(e => e.IsDeleted)
+                   .IsRequired()
+                   .HasDefaultValue(0)
+                   .HasColumnName("user_isdeleted");
             });
 
-            modelBuilder.Entity<UserModel>()
-                .HasOne(b => b.State)
-                .WithOne(i => i.User)
-                .HasForeignKey<StateModel>(b => b.UserId);
+            modelBuilder.Entity<SleepEntryModel>()
+                       .HasOne(p => p.User)
+                       .WithMany(b => b.SleepEntries)
+                       .HasForeignKey(p => p.UserId);
 
             OnModelCreatingPartial(modelBuilder);
         }

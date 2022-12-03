@@ -34,11 +34,11 @@ namespace MyWebApp
 
             if (_env.IsDevelopment())
             {
-                services.AddSingleton<DBContext>(s => new DBContext(Configuration.GetConnectionString("LocalDatabaseConnectString")));
+                services.AddSingleton<DBContext>(s => new DBContext(Configuration.GetConnectionString("NewServerDatabaseConnectString")));
             }
             else
             {
-                services.AddSingleton<DBContext>(s => new DBContext(Configuration.GetConnectionString("DatabaseConnectString")));
+                services.AddSingleton<DBContext>(s => new DBContext(Configuration.GetConnectionString("NewServerDatabaseConnectString")));
             }
 
             services.Configure<ApiBehaviorOptions>(options =>
@@ -50,10 +50,9 @@ namespace MyWebApp
             services.Configure<AppSettings>(Configuration.GetSection("Jwt"));
 
             services.AddSingleton<IUserService, UserRepository>();
-            services.AddSingleton<IStateService, StateRepository>();
+            services.AddSingleton<ISleepEntryService, SleepEntryRepository>();
 
             services.AddSingleton<IAuthorizeJwt, JwtService>();
-            services.AddSingleton<ICustomPagination, PaginationService>();
 
             services.AddSwaggerGen(c =>
             {
@@ -95,12 +94,16 @@ namespace MyWebApp
                    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
             );
 
-            if (_env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_Web_Core v1"));
-            }
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_Web_Core v1"));
+
+            //if (_env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //    app.UseSwagger();
+            //    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_Web_Core v1"));
+            //}
            
             app.UseMiddleware<JwtAuthorize>();
 

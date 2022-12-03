@@ -10,6 +10,9 @@ namespace MyWebApp.Models
         public string Email { get; set; }
         public string Password { get; set; }
 
-        public virtual StateModel State { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool IsAdmin { get; set; }
+
+        public List<SleepEntryModel> SleepEntries { get; set; }
     }
 }
