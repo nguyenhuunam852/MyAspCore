@@ -48,8 +48,8 @@ namespace MyWebApp.Migrations
                         .HasDefaultValue(0)
                         .HasColumnName("sleep_entry_page");
 
-                    b.Property<DateTime?>("SleepTime")
-                        .HasColumnType("datetime2")
+                    b.Property<int>("SleepTime")
+                        .HasColumnType("int")
                         .HasColumnName("sleep_entry_wakeuptime");
 
                     b.Property<int>("UserId")

@@ -6,8 +6,8 @@
         public int SleepEntryId;
 
         public DateTime? Date;
-        public DateTime? SleepTime;
-        public DateTime? WakeUpTime;
+        public int SleepTime;
+        public int WakeUpTime;
 
         public bool IsDeleted;
 

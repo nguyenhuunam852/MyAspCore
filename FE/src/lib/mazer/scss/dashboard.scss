@@ -1,0 +1,18 @@
+// Custom variable of mazer
+@import "@/assets/styles/app-styles/variables";
+
+// Import mazer Variables
+@import "./variables";
+
+// Bootstrap
+@import "./bootstrap";
+
+// Perfect Scrollbar
+@import "~/perfect-scrollbar/css/perfect-scrollbar.css";
+
+// Mazer CSS
+@import "./mazer";
+
+// Theme dark
+// Custom variable of mazer
+@import "./themes/dark/app-dark.scss";

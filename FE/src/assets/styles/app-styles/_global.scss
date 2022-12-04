@@ -1,0 +1,128 @@
+// Utilities
+textarea.textarea-no-resize {
+    resize: none;
+}
+.text-tiny {
+    font-size: 0.75rem;
+}
+
+// Filter
+.filter-item {
+    width: 100%;
+    max-width: 150px;
+}
+
+// Scrollbar
+.scroll-x{
+    /* width */
+    &::-webkit-scrollbar {
+        height: 6px;
+        border-radius: 6px;
+    }
+    
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 6px;
+    }
+
+    /* Track on hover */
+    &::-webkit-scrollbar-track:hover {
+        background: rgba(131, 131, 131, 0.2);
+    }
+    
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: rgba(131, 131, 131, 0.2); 
+        border-radius: 6px;
+    }
+    
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+}
+.scroll-y{
+    /* width */
+    &::-webkit-scrollbar {
+        width: 6px;
+        border-radius: 6px;
+    }
+    
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 6px;
+    }
+
+    /* Track on hover */
+    &::-webkit-scrollbar-track:hover {
+        background: rgba(131, 131, 131, 0.2);
+    }
+    
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: rgba(131, 131, 131, 0.2); 
+        border-radius: 6px;
+    }
+    
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+}
+
+// SIDEBAR PROFILE
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 2rem;
+    margin-top: 2rem;
+    .profile-avt {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        border-radius: 10rem;
+        overflow: hidden;
+        object-fit: cover;
+        object-position: center;
+    }
+    .profile-info {
+        .name {
+            font-size: 1.2rem;
+            margin-bottom: 0; 
+        }
+        .email {
+            font-size: 0.8rem;
+            margin-bottom: 0;
+        }
+    }
+}
+.sidebar-footer {
+    padding: 0 2rem;
+}
+
+// ERROR
+.img-error {
+    max-width: 600px;
+}
+
+// MODAL
+.modal {
+    .modal-header {
+        .close {
+            display: flex;
+            padding: 10px;
+        }
+    }
+}
+
+// TOOLTIP
+.custom-tooltip {
+    font-size: 0.8rem;
+}
+
+[data-bs-toggle='tooltip'] * {
+    pointer-events: none;
+}

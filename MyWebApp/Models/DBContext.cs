@@ -97,7 +97,7 @@ namespace MyWebApp.Models
                 entity.Property(e => e.SleepTime)
                    .HasColumnName("sleep_entry_sleeptime");
 
-                entity.Property(e => e.SleepTime)
+                entity.Property(e => e.WakeUpTime)
                    .HasColumnName("sleep_entry_wakeuptime");
 
                 entity.Property(e => e.IsDeleted)

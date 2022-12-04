@@ -131,9 +131,28 @@ namespace MyWebApp.Controllers
             {
                 var account = (UserModel)HttpContext.Items["Account"];
 
-                List<SleepEntryModel> sleepEntry = this._sleepEntryInterface.GetAllSleepEntries(account.UserId);
+                List<SleepEntryModel> sleepEntries = this._sleepEntryInterface.GetAllSleepEntries(account.UserId);
 
-                return new CustomResponse(content: sleepEntry);
+                int averageSleepTime = 0;
+                int averageWakeUpTime = 0;
+                int averageDuration = 0;
+
+                if (sleepEntries.Count > 0)
+                {
+                    averageSleepTime = sleepEntries.Sum(item => item.SleepTime) / sleepEntries.Count;
+                    averageWakeUpTime = sleepEntries.Sum(item => item.SleepTime) / sleepEntries.Count;
+                    averageDuration = sleepEntries.Sum(item => item.SleepDuration) / sleepEntries.Count;
+                }
+
+                var responseObject = new SleepDurationGetListResponse()
+                {
+                    AverageDuration = averageDuration,
+                    AverageWakeUpTime = averageWakeUpTime,
+                    AverageSleepTime = averageSleepTime,
+                    SleepEntries = sleepEntries,
+                };
+
+                return new CustomResponse(content: responseObject);
             }
             catch (Exception e)
             {
@@ -211,9 +230,10 @@ namespace MyWebApp.Controllers
 
                 return new CustomResponse(content: new SleepEntryCreateResponse()
                 {
+                    SleepEntryId = sleepEntry.SleepEntryId,
                     Date = (DateTime)sleepEntry.Date,
-                    SleepTime = (DateTime)sleepEntry.SleepTime,
-                    WakeUpTime = (DateTime)sleepEntry.WakeUpTime,
+                    SleepTime = sleepEntry.SleepTime,
+                    WakeUpTime =sleepEntry.WakeUpTime,
                     Duration = sleepEntry.SleepDuration
                 }
              );
